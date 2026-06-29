@@ -38,42 +38,43 @@ CrisisCortex fuses **three weak signals** into a strong prediction — designed 
 
 ## Architecture (Real, Not Conceptual)
 
-┌─────────────────────────────────────────────────────────────┐
-│                      EDGE DEVICE                            │
-│                Raspberry Pi 4 + Coral TPU                   │
-│                                                             │
-│  ┌─────────────┐   ┌─────────────┐   ┌─────────────────┐    │
-│  │  RTL-SDR    │   │ Sentinel-2  │   │  VIIRS Night    │    │
-│  │ 95.5 MHz FM │   │  NDVI diff  │   │  Lights trend   │    │
-│  │      ↓      │   │      ↓      │   │       ↓         │    │
-│  │  Whisper    │   │   DINOv2    │   │   Temporal      │    │
-│  │(dialect-    │   │  (change    │   │   Encoder       │    │
-│  │  tuned)     │   │ detection)  │   │ (60-day window) │    │
-│  └──────┬──────┘   └──────┬──────┘   └────────┬────────┘    │
-│         │                 │                    │             │
-│         └─────────────────┼────────────────────┘             │
-│                           ▼                                  │
-│              ┌─────────────────────────┐                     │
-│              │    Cross-Modal Attention  │                     │
-│              │  (text queries vision     │                     │
-│              │   + temporal context)     │                     │
-│              └───────────┬─────────────┘                     │
-│                          ▼                                   │
-│              ┌─────────────────────────┐                     │
-│              │     Crisis Classifier     │                     │
-│              │  • food_insecurity      │                     │
-│              │  • disease_outbreak     │                     │
-│              │  • conflict_escalation  │                     │
-│              └───────────┬─────────────┘                     │
-│                          ▼                                   │
-│              ┌─────────────────────────┐                     │
-│              │     Explainable Alert     │                     │
-│              │  "NDVI dropped 40% in   │                     │
-│              │   agricultural zone +    │                     │
-│              │   radio mentions 'empty  │                     │
-│              │   market' 3x this week" │                     │
-│              └─────────────────────────┘                     │
-└─────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────┐
+│           EDGE DEVICE                  │
+│      Raspberry Pi 4 + Coral TPU        │
+│                                        │
+│  ┌────────┐  ┌────────┐  ┌────────┐  │
+│  │RTL-SDR │  │Sentinel│  │ VIIRS  │  │
+│  │95.5MHz │  │  -2    │  │ Night  │  │
+│  │   FM   │  │ NDVI   │  │ Lights │  │
+│  │   ↓    │  │  diff  │  │ trend  │  │
+│  │Whisper │  │ DINOv2 │  │Temporal│  │
+│  │(dialect│  │(change │  │Encoder │  │
+│  │ tuned) │  │detect) │  │(60-day)│  │
+│  └───┬────┘  └───┬────┘  └───┬────┘  │
+│      │           │           │        │
+│      └───────────┼───────────┘        │
+│                  ▼                     │
+│      ┌──────────────────┐             │
+│      │ Cross-Modal      │             │
+│      │ Attention        │             │
+│      │ (text queries    │             │
+│      │  vision + time)  │             │
+│      └────────┬─────────┘             │
+│               ▼                        │
+│      ┌──────────────────┐             │
+│      │ Crisis Classifier│             │
+│      │ • food_insecurity│             │
+│      │ • disease_outbrk │             │
+│      │ • conflict_spike │             │
+│      └────────┬─────────┘             │
+│               ▼                        │
+│      ┌──────────────────┐             │
+│      │ Explainable Alert│             │
+│      │ "NDVI -40%,      │             │
+│      │  radio: 'empty   │             │
+│      │  market' x3"     │             │
+│      └──────────────────┘             │
+└────────────────────────────────────────┘
 
 
 **Inference time:** <2 seconds on Raspberry Pi 4  
