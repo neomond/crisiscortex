@@ -38,45 +38,31 @@ CrisisCortex fuses **three weak signals** into a strong prediction — designed 
 
 ## Architecture (Real, Not Conceptual)
 
-┌────────────────────────────────┐
-│      EDGE DEVICE               │
-│  Raspberry Pi 4 + Coral TPU    │
-│                                │
-│  ┌──────┐ ┌──────┐ ┌──────┐  │
-│  │RTL   │ │Sent  │ │VIIRS │  │
-│  │SDR   │ │-2    │ │Night │  │
-│  │FM    │ │NDVI  │ │Light │  │
-│  │↓     │ │diff  │ │trend │  │
-│  │Whspr │ │DINOv2│ │Temp  │  │
-│  │(dial)│ │(chng)│ │(60d) │  │
-│  └───┬──┘ └───┬──┘ └───┬──┘  │
-│      │        │        │      │
-│      └────────┼────────┘      │
-│               ▼                │
-│      ┌──────────────┐          │
-│      │Cross-Modal   │          │
-│      │Attention     │          │
-│      └──────┬───────┘          │
-│             ▼                  │
-│      ┌──────────────┐          │
-│      │Crisis Class  │          │
-│      │• food        │          │
-│      │• disease     │          │
-│      │• conflict    │          │
-│      └──────┬───────┘          │
-│             ▼                  │
-│      ┌──────────────┐          │
-│      │Explain Alert │          │
-│      │"NDVI -40%   │          │
-│      │radio 'empty' │          │
-│      │x3 this week" │          │
-│      └──────────────┘          │
-└────────────────────────────────┘
+**Three inputs → One fusion model → Crisis prediction**
 
+### Input Layer
+| Component | Source | What It Detects |
+|-----------|--------|-----------------|
+| **RTL-SDR Radio** | $20 FM dongle | Local price spikes, disease rumors, militia movement |
+| **Sentinel-2 Vision** | Free satellite API | Crop failure, water stress, infrastructure damage |
+| **VIIRS Night-Lights** | Free daily data | Economic collapse, displacement, power outages |
 
-**Inference time:** <2 seconds on Raspberry Pi 4  
-**Power draw:** ~5W (solar-panel compatible)  
-**Connectivity:** None required for inference; SMS mesh for alerts
+### Processing Layer
+1. **Whisper** (dialect-tuned) → transcribes radio broadcasts
+2. **DINOv2** → detects vegetation change from satellite images
+3. **Temporal Encoder** → spots light pattern trends over 60 days
+
+### Fusion Layer
+**Cross-Modal Attention** — text queries vision + temporal context to find correlations
+
+### Output Layer
+**Crisis Classifier** → food insecurity / disease outbreak / conflict escalation
+
+**Explainable Alert** → "NDVI dropped 40% in agricultural zone + radio mentions 'empty market' 3x this week"
+
+---
+
+**Edge specs:** &lt;2s inference | ~5W power | No cloud required | SMS mesh alerts
 
 
 ---
